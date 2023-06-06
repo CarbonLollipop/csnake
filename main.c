@@ -6,6 +6,7 @@
 #include <time.h>
 
 void quit(int score) {
+    erase();
     curs_set(1);
     endwin();
     printf("Game over! Score: %d\n", score);
@@ -16,7 +17,8 @@ int main() {
 
     int direction = 0;
 
-    /* 0 = left
+    /* 
+     * 0 = left
      * 1 = down
      * 2 = up
      * 3 = right
@@ -58,10 +60,26 @@ int main() {
    
     while(1) {
         int c = getch();
- 
+
+        printw(" ");
+        int snakeBody[score][2];
+
+        for (int i = 0; i < score; i++) {
+            snakeBody[i][0] = snakePos[0];
+            snakeBody[i][1] = snakePos[1];
+        }
+
         move(snakePos[0], snakePos[1]);
         printw(" ");
 
+        for (int i = 0; i < score; i++) {
+            move(snakeBody[i][0], snakeBody[i][1]);
+            printw("o");
+        }
+
+        move(snakeBody[score][0], snakeBody[score][1]);
+        printw(" ");
+        
         if (c == 'q')
             break;
         if (c == 'h')
@@ -82,6 +100,9 @@ int main() {
         if (direction == 3)
             snakePos[1]++;
 
+        if (mvinch(snakePos[0], snakePos[1]) == 'o')
+            break;
+       
         if (snakePos[0] == 0 || snakePos[0] == y - 1 || snakePos[1] == 0 || snakePos[1] == x - 1)
             break;
 
@@ -91,7 +112,6 @@ int main() {
             score++;
         }
 
-
         move(snakePos[0], snakePos[1]);
         printw("#");
      
@@ -99,7 +119,8 @@ int main() {
         printw("@");
 
         refresh();
-        usleep(100000);
+        
+        usleep(3 * 10000 - (score / 0.25));
     }
 
     quit(score);
