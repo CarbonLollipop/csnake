@@ -14,6 +14,7 @@ void quit(int score) {
 }
 
 int main() {
+    srand(time(NULL));
 
     int direction = 0;
 
@@ -23,8 +24,6 @@ int main() {
      * 2 = up
      * 3 = right
      */
-
-    srand(time(NULL));
 
     initscr();
     signal(SIGINT, quit);
@@ -55,40 +54,28 @@ int main() {
     printw("%s", horizontalWall);
 
     int snakePos[2] = {y / 2, x / 2};
-    int foodPos[2] = {rand() % (y - 2) + 1, rand() % (x - 2) + 1};
-    int score = 0;
-   
+    // MEGA HAX
+    int score = 2;
+    int snakeBody[2048][2];
+
+    // draw @ at five random locations
+    for (int i = 0; i < 5; i++) {
+        move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
+        printw("@");
+    }
+
     while(1) {
         int c = getch();
 
-        printw(" ");
-        int snakeBody[score][2];
-
-        for (int i = 0; i < score; i++) {
-            snakeBody[i][0] = snakePos[0];
-            snakeBody[i][1] = snakePos[1];
-        }
-
-        move(snakePos[0], snakePos[1]);
-        printw(" ");
-
-        for (int i = 0; i < score; i++) {
-            move(snakeBody[i][0], snakeBody[i][1]);
-            printw("o");
-        }
-
-        move(snakeBody[score][0], snakeBody[score][1]);
-        printw(" ");
-        
         if (c == 'q')
             break;
-        if (c == 'h')
+        if (c == 'h' && direction != 3)
            direction = 0;
-        if (c == 'j')
+        if (c == 'j' && direction != 2)
             direction = 1;
-        if (c == 'k')
+        if (c == 'k' && direction != 1)
             direction = 2;
-        if (c == 'l')
+        if (c == 'l' && direction != 0)
             direction = 3;
    
         if (direction == 0)
@@ -102,27 +89,46 @@ int main() {
 
         if (mvinch(snakePos[0], snakePos[1]) == 'o')
             break;
-       
+
+        if(mvinch(snakePos[0], snakePos[1]) == '@') {
+            // draw new food at random location
+            move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
+            printw("@");
+            score++;
+        }
+           
         if (snakePos[0] == 0 || snakePos[0] == y - 1 || snakePos[1] == 0 || snakePos[1] == x - 1)
             break;
 
-        if (snakePos[0] == foodPos[0] && snakePos[1] == foodPos[1]) {
-            foodPos[0] = rand() % (y - 2) + 1;
-            foodPos[1] = rand() % (x - 2) + 1;
-            score++;
+        printw(" ");
+
+        for (int i = 0; i < score; i++) {
+            move(snakeBody[i][0], snakeBody[i][1]);
+            printw(" ");
         }
+
+        for (int i = score; i > 0; i--) {
+            snakeBody[i][0] = snakeBody[i - 1][0];
+            snakeBody[i][1] = snakeBody[i - 1][1];
+        }
+
+        // draw 'o' for snake body
+        for (int i = 0; i < score; i++) {
+            move(snakeBody[i][0], snakeBody[i][1]);
+            printw("o");
+        }
+
+        snakeBody[0][0] = snakePos[0];
+        snakeBody[0][1] = snakePos[1];
 
         move(snakePos[0], snakePos[1]);
         printw("#");
      
-        move(foodPos[0], foodPos[1]);
-        printw("@");
-
         refresh();
         
         usleep(3 * 10000 - (score / 0.25));
     }
 
-    quit(score);
+    quit(score - 2);
 }
 
