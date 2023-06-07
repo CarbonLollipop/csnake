@@ -28,6 +28,8 @@ int main(int argc, char** argv) {
     initscr();
     signal(SIGINT, quit);
     nodelay(stdscr, TRUE);
+    start_color();
+    keypad(stdscr, TRUE);
 
     noecho();
     curs_set(0);
@@ -59,9 +61,16 @@ int main(int argc, char** argv) {
     int snakeBody[2048][2];
 
     int food = (argc > 1) ? atoi(argv[1]) : 20;
-    
+
     for (int i = 0; i < food; i++) {
-        move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
+        int curx, cury;
+        do {
+            curx = rand() % (x - 2) + 1;
+            cury = rand() % (y - 2) + 1;
+            move(cury, curx);
+        } while (mvinch(cury, curx) != ' ');
+
+        move(cury, curx);
         printw("@");
     }
 
@@ -70,15 +79,15 @@ int main(int argc, char** argv) {
 
         if (c == 'q')
             break;
-        if (c == 'h' && direction != 3)
+        if ((c == 'h' || c == KEY_LEFT) && direction != 3)
            direction = 0;
-        if (c == 'j' && direction != 2)
+        if ((c == 'j' || c == KEY_DOWN) && direction != 2)
             direction = 1;
-        if (c == 'k' && direction != 1)
+        if ((c == 'k' || c == KEY_UP) && direction != 1)
             direction = 2;
-        if (c == 'l' && direction != 0)
+        if ((c == 'l' || c == KEY_RIGHT) && direction != 0)
             direction = 3;
-   
+
         if (direction == 0)
             snakePos[1]--;
         if (direction == 1)
