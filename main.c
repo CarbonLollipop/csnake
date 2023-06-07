@@ -31,6 +31,9 @@ int main(int argc, char** argv) {
     start_color();
     keypad(stdscr, TRUE);
 
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+
     noecho();
     curs_set(0);
 
@@ -40,16 +43,16 @@ int main(int argc, char** argv) {
     char* horizontalWall = malloc(x + 1);
 
     for (int i = 0; i < x; i++)
-        horizontalWall[i] = '-';
+        horizontalWall[i] = '~';
 
     horizontalWall[x] = '\0';
     printw("%s", horizontalWall);
 
     for (int i = 0; i < y - 2; i++) {
         move(i + 1, 0);
-        printw("[");
+        printw("|");
         move(i + 1, x - 1);
-        printw("]");
+        printw("|");
     }
 
     move(y - 1, 0);
@@ -62,6 +65,7 @@ int main(int argc, char** argv) {
 
     int food = (argc > 1) ? atoi(argv[1]) : 20;
 
+
     for (int i = 0; i < food; i++) {
         int curx, cury;
         do {
@@ -73,6 +77,7 @@ int main(int argc, char** argv) {
         move(cury, curx);
         printw("@");
     }
+
 
     while(1) {
         int c = getch();
@@ -97,15 +102,17 @@ int main(int argc, char** argv) {
         if (direction == 3)
             snakePos[1]++;
 
-        if (mvinch(snakePos[0], snakePos[1]) == 'o')
-            break;
+        for (int i = 0; i < score; i++) {
+            if (snakePos[0] == snakeBody[i][0] && snakePos[1] == snakeBody[i][1])
+                quit(score - 2); 
+        }
 
         if(mvinch(snakePos[0], snakePos[1]) == '@') {
             move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
             printw("@");
             score++;
         }
-           
+
         if (snakePos[0] == 0 || snakePos[0] == y - 1 || snakePos[1] == 0 || snakePos[1] == x - 1)
             break;
 
@@ -121,20 +128,27 @@ int main(int argc, char** argv) {
             snakeBody[i][1] = snakeBody[i - 1][1];
         }
 
+        attron(COLOR_PAIR(1));
+
         for (int i = 0; i < score; i++) {
             move(snakeBody[i][0], snakeBody[i][1]);
             printw("o");
         }
 
+        attroff(COLOR_PAIR(1));
+
         snakeBody[0][0] = snakePos[0];
         snakeBody[0][1] = snakePos[1];
 
         move(snakePos[0], snakePos[1]);
+        // print a green # for the snake's head
+        attron(COLOR_PAIR(1));   
         printw("#");
-     
+        attroff(COLOR_PAIR(1));
+
         refresh();
         
-        usleep(3 * 10000 - (score / 0.25));
+        usleep(70000);
     }
 
     quit(score - 2);
