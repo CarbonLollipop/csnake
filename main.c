@@ -13,7 +13,7 @@ void quit(int score) {
     exit(0);
 }
 
-int main() {
+int main(int argc, char** argv) {
     srand(time(NULL));
 
     int direction = 0;
@@ -58,8 +58,9 @@ int main() {
     int score = 2;
     int snakeBody[2048][2];
 
-    // draw @ at five random locations
-    for (int i = 0; i < 5; i++) {
+    int food = (argc > 1) ? atoi(argv[1]) : 20;
+    
+    for (int i = 0; i < food; i++) {
         move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
         printw("@");
     }
@@ -91,7 +92,6 @@ int main() {
             break;
 
         if(mvinch(snakePos[0], snakePos[1]) == '@') {
-            // draw new food at random location
             move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
             printw("@");
             score++;
@@ -112,7 +112,6 @@ int main() {
             snakeBody[i][1] = snakeBody[i - 1][1];
         }
 
-        // draw 'o' for snake body
         for (int i = 0; i < score; i++) {
             move(snakeBody[i][0], snakeBody[i][1]);
             printw("o");
