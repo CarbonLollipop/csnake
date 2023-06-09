@@ -65,7 +65,6 @@ int main(int argc, char** argv) {
 
     int food = (argc > 1) ? atoi(argv[1]) : 20;
 
-
     for (int i = 0; i < food; i++) {
         int curx, cury;
         do {
@@ -77,7 +76,6 @@ int main(int argc, char** argv) {
         move(cury, curx);
         printw("@");
     }
-
 
     while(1) {
         int c = getch();
@@ -116,8 +114,6 @@ int main(int argc, char** argv) {
         if (snakePos[0] == 0 || snakePos[0] == y - 1 || snakePos[1] == 0 || snakePos[1] == x - 1)
             break;
 
-        printw(" ");
-
         for (int i = 0; i < score; i++) {
             move(snakeBody[i][0], snakeBody[i][1]);
             printw(" ");
@@ -141,14 +137,13 @@ int main(int argc, char** argv) {
         snakeBody[0][1] = snakePos[1];
 
         move(snakePos[0], snakePos[1]);
-        // print a green # for the snake's head
         attron(COLOR_PAIR(1));   
         printw("#");
         attroff(COLOR_PAIR(1));
 
         refresh();
         
-        usleep(70000);
+        usleep(70000 - (score * 1000));
     }
 
     quit(score - 2);
