@@ -13,6 +13,18 @@ void quit(int score) {
     exit(0);
 }
 
+void drawFood(int x, int y) {
+    int foodx, foody;
+    
+    do {
+        foodx = rand() % (x - 2) + 1;
+        foody = rand() % (y - 2) + 1;
+        move(foody, foodx);
+    } while (mvinch(foody, foodx) != ' ');
+
+    printw("@");
+}
+
 int main(int argc, char** argv) {
     srand(time(NULL));
 
@@ -66,15 +78,7 @@ int main(int argc, char** argv) {
     int food = (argc > 1) ? atoi(argv[1]) : 20;
 
     for (int i = 0; i < food; i++) {
-        int curx, cury;
-        do {
-            curx = rand() % (x - 2) + 1;
-            cury = rand() % (y - 2) + 1;
-            move(cury, curx);
-        } while (mvinch(cury, curx) != ' ');
-
-        move(cury, curx);
-        printw("@");
+        drawFood(x, y);
     }
 
     while(1) {
@@ -106,9 +110,8 @@ int main(int argc, char** argv) {
         }
 
         if(mvinch(snakePos[0], snakePos[1]) == '@') {
-            move(rand() % (y - 2) + 1, rand() % (x - 2) + 1);
-            printw("@");
             score++;
+            drawFood(x, y);
         }
 
         if (snakePos[0] == 0 || snakePos[0] == y - 1 || snakePos[1] == 0 || snakePos[1] == x - 1)
