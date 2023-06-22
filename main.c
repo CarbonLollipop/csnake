@@ -6,10 +6,10 @@
 #define SNAKE_BACKGROUND_COLOR COLOR_BLACK
 
 // For example, this value set to 2 would make the snake two times faster
-#define GAME_SPEED_MULTIPLIER 1
+#define GAME_SPEED_MULTIPLIER 2
 
 // How much score you get for eating food
-#define FOOD_SCORE 1
+#define FOOD_SCORE 10
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,15 +38,6 @@ void drawFood(int x, int y) {
 
 int main(int argc, char** argv) {
     srand(time(NULL));
-
-    int direction = 0;
-
-    /* 
-     * 0 = left
-     * 1 = down
-     * 2 = up
-     * 3 = right
-     */
 
     initscr();
     signal(SIGINT, quit);
@@ -94,7 +85,16 @@ int main(int argc, char** argv) {
     for (int i = 0; i < food; i++) {
         drawFood(x, y);
     }
-    
+ 
+    int direction = rand() % 4;
+
+    /* 
+     * 0 = left
+     * 1 = down
+     * 2 = up
+     * 3 = right
+     */
+
     int lost = 0;
 
     while(1) {
@@ -173,6 +173,9 @@ int main(int argc, char** argv) {
     printw("Hit any key to exit...");
     curs_set(1);
     nodelay(stdscr, FALSE);
+
+    refresh();
+    usleep(1000000);
     getch();
     
     quit(score - 2);
