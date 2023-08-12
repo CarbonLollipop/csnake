@@ -6,10 +6,10 @@
 #define SNAKE_BACKGROUND_COLOR COLOR_BLACK
 
 // For example, this value set to 2 would make the snake two times faster
-#define GAME_SPEED_MULTIPLIER 2
+#define GAME_SPEED_MULTIPLIER 1
 
 // How much score you get for eating food
-#define FOOD_SCORE 10
+#define FOOD_SCORE 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,11 +17,24 @@
 #include <signal.h>
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 
 void quit() {
     endwin(); 
     curs_set(1);
     exit(0);
+}
+
+void type(char string[]) {
+	int len = strlen(string);
+
+	for(int i = 0; i < len; i++) {
+		int isPunct = string[i] == '!' || string[i] == '.' || string[i] == ':';
+		
+		printw("%c", string[i]);
+		refresh();
+		usleep(50000 + (isPunct * 100000));
+	}
 }
 
 void drawFood(int x, int y) {
@@ -54,31 +67,10 @@ int main(int argc, char** argv) {
     int x, y;
     getmaxyx(stdscr, y, x);
 
-    //char* horizontalWall = malloc(x + 1);
-
-    //for (int i = 0; i < x + 1; i++)
-    //    horizontalWall[i] = '~';
-
-    //horizontalWall[x] = '\0';
-    //printw("%s", horizontalWall);
-
-    //for (int i = 0; i < y - 1; i++) {
-    //    move(i + 1, 0);
-    //    printw("|");
-    //    move(i + 1, x - 1);
-    //    printw("|");
-    //}
-
-    //move(y - 1, 0);
-    //printw("%s", horizontalWall);
-
     int snakePos[2] = {y / 2, x / 2};
     // MEGA HAX
     int score = 2;
     int snakeBody[2048][2];
-
-    // note to future self: atoi means ascii to integer
-    // its a stupid name
 
     int food = (argc > 1) ? atoi(argv[1]) : 20;
 
@@ -167,15 +159,24 @@ int main(int argc, char** argv) {
         usleep(((50000 - (score * 1000) > 20000 ? 50000 - (score * 1000) : 20000) * 2) / GAME_SPEED_MULTIPLIER);
     }
     
-    move(y / 2, (x / 2) - 10);
-    printw("Game over! Score: %d", score);
-    move((y / 2) + 1, (x / 2) - 10);
-    printw("Hit any key to exit...");
-    curs_set(1);
+    move(y / 2 - 1, (x / 2) - 10);
+    type("Game over! Score: ");
+
+    // oh dear lord the hax
+    printw("%d", score);
+    refresh();
+    
+    usleep(1000000);
+    
+    move((y / 2) + 1, (x / 2) - 10 - 1);
+    
+    refresh();
+    
+    type("Hit any key to exit...");
     nodelay(stdscr, FALSE);
 
+    curs_set(1);
     refresh();
-    usleep(1000000);
     getch();
     
     quit(score - 2);
